@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% if notes %}
+<div class="notes-grid">
+    {% for note in notes %}
+    <div class="card {{ 'card--pinned' if note.pinned }}">
+        <div class="card-header">
+            <h2 class="card-title">
+                {% if note.pinned %}<span class="pin-icon" title="Закреплена">&#128204;</span>{% endif %}
+                {{ note.title }}
+            </h2>
+            <button
+                class="btn-icon pin-toggle"
+                data-note-id="{{ note.id }}"
+                title="{{ 'Открепить' if note.pinned else 'Закрепить' }}"
+            >
+                {{ '&#128204;' if note.pinned else '&#128392;' }}
+            </button>
+        </div>
+
+        {% if note.content %}
+        <p class="card-content">{{ note.content[:200] }}{% if note.content|length > 200 %}&hellip;{% endif %}</p>
+        {% endif %}
+
+        <div class="card-footer">
+            <span class="card-date">{{ note.updated_at.strftime('%d.%m.%Y %H:%M') }}</span>
+            <div class="card-actions">
+                <a href="{{ url_for('notes.edit', note_id=note.id) }}" class="btn btn-small">Редактировать</a>
+                <form method="post" action="{{ url_for('notes.delete', note_id=note.id) }}" class="delete-form">
+                    <button type="submit" class="btn btn-small btn-danger">Удалить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <p>Заметок пока нет.</p>
+    <a href="{{ url_for('notes.new') }}" class="btn btn-primary">Создать первую</a>
+</div>
+{% endif %}
+{% endblock %}
